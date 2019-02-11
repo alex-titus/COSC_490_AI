@@ -13,6 +13,8 @@ def tile(tileX, tileY):
 
 def wall(wallX, wallY):
     display.blit(textures[WALL], (wallX*TILESIZE, wallY*TILESIZE))
+    pygame.draw.rect(display, (0, 0, 0), [wallX, wallY, TILESIZE, TILESIZE], 1)
+    pygame.display.update()
 
 def portal(portalX, portalY):
     display.blit(textures[PORTAL], (portalX*TILESIZE, portalY*TILESIZE))
@@ -84,6 +86,12 @@ while True:
             pygame.quit()
             sys.exit()
 
+    if playerX == portalX:
+        if playerY == portalY:
+            print("Portal was found in : " + str(steps) + " steps.")
+            pygame.quit()
+            sys.exit()
+
         if event.type == KEYDOWN:
             if event.key == K_LEFT or event.key == ord('a'):
                 playerX -= 1
@@ -98,33 +106,39 @@ while True:
                 playerY += 1
                 print("Player moved down to: X" + str(playerX) + " Y" + str(playerY))
 
-    if playerX == portalX:
-        if playerY == portalY:
-            print("Portal was found in : " + str(steps) + " steps.")
-            pygame.quit()
-            sys.exit()
-
     direction = AI.random_direction()
     if direction == 'up':
-        if playerY > 1:
-            tile(playerX, playerY)
-            playerY -= 1
-            steps += 1
+        if playerY >= 1:
+            if playerY == 1:
+                steps += 1
+            else:
+                tile(playerX, playerY)
+                playerY -= 1
+                steps += 1
     if direction == 'down':
-        if playerY < 8:
-            tile(playerX, playerY)
-            playerY += 1
-            steps += 1
+        if playerY <= 8:
+            if playerY == 8:
+                steps += 1
+            else:
+                tile(playerX, playerY)
+                playerY += 1
+                steps += 1
     if direction == 'left':
-        if playerX > 1:
-            tile(playerX, playerY)
-            playerX -= 1
-            steps += 1
+        if playerX >= 1:
+            if playerX == 1:
+                steps +=1
+            else:
+                tile(playerX, playerY)
+                playerX -= 1
+                steps += 1
     if direction == 'right':
-        if playerX < 8:
-            tile(playerX, playerY)
-            playerX += 1
-            steps += 1
+        if playerX <= 8:
+            if playerX == 8:
+                steps += 1
+            else:
+                tile(playerX, playerY)
+                playerX += 1
+                steps += 1
 
     player(playerX, playerY)
     pygame.display.update()
