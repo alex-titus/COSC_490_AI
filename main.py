@@ -1,4 +1,4 @@
-import pygame, sys, time
+import pygame, time, sys
 from pygame.locals import *
 import DecisionFactory
 
@@ -6,11 +6,16 @@ import DecisionFactory
 AI = DecisionFactory.DecisionFactory()
 
 def player(playerX, playerY):
-    pygame.transform.scale(pygame.image.load('PLAYER copy.png'), [TILESIZE, TILESIZE])
     display.blit(textures[PLAYER],(playerX*TILESIZE, playerY*TILESIZE))
 
 def tile(tileX, tileY):
     display.blit(textures[TILE], (tileX*TILESIZE, tileY*TILESIZE))
+
+def wall(wallX, wallY):
+    display.blit(textures[WALL], (wallX*TILESIZE, wallY*TILESIZE))
+
+def portal(portalX, portalY):
+    display.blit(textures[PORTAL], (portalX*TILESIZE, portalY*TILESIZE))
 
 # Which map we are going to be opening
 currentMap = open("firstmap.txt", 'r')
@@ -55,28 +60,23 @@ for line in currentMap:
     row = 0
     for ch in line:
         if ch == '1':
-            display.blit(textures[WALL], (row*TILESIZE, column*TILESIZE))
-            row += 1
+            wall(row, column)
         elif ch == '.':
-            display.blit(textures[TILE], (row*TILESIZE, column*TILESIZE))
-            row += 1
+            tile(row, column)
         elif ch == '0':
-            display.blit(textures[TILE], (row*TILESIZE, column*TILESIZE))
+            tile(row, column)
             playerX = row
             playerY = column
-            row += 1
         elif ch == '2':
-            display.blit(textures[PORTAL], (row*TILESIZE, column*TILESIZE))
+            portal(row, column)
             portalX = row
             portalY = column
-            row += 1
-        else:
-            row += 1
+        row += 1
     column += 1
-print("Map drawn")
-print("Player is at: X" + str(playerX) + " Y" + str(playerY))
-print("Portal is at: X" + str(portalX) + " Y" + str(portalY))
 
+print("Player is at: (" + str(playerX) + ", " + str(playerY) + ")")
+print("Portal is at: (" + str(portalX) + ", " + str(portalY) + ")")
+steps = 0
 while True:
     # Get all the user events
     for event in pygame.event.get():
@@ -100,6 +100,7 @@ while True:
 
     if playerX == portalX:
         if playerY == portalY:
+            print("Portal was found in : " + str(steps) + " steps.")
             pygame.quit()
             sys.exit()
 
@@ -108,22 +109,22 @@ while True:
         if playerY > 1:
             tile(playerX, playerY)
             playerY -= 1
-            print("step up")
+            steps += 1
     if direction == 'down':
         if playerY < 8:
             tile(playerX, playerY)
             playerY += 1
-            print("step down")
+            steps += 1
     if direction == 'left':
         if playerX > 1:
             tile(playerX, playerY)
             playerX -= 1
-            print("step left")
+            steps += 1
     if direction == 'right':
-        if playerX < 9:
+        if playerX < 8:
             tile(playerX, playerY)
             playerX += 1
-            print("step right")
+            steps += 1
 
     player(playerX, playerY)
     pygame.display.update()
