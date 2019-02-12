@@ -23,7 +23,7 @@ def portal(portalX, portalY):
 currentMap = open("firstmap.txt", 'r')
 
 # Information about the map we are creating
-TILESIZE = 60
+TILESIZE = 40
 MAPWIDTH = 10
 MAPHEIGHT = 10
 
@@ -39,13 +39,13 @@ portalY = 0
 
 # Dictating TILEs and how they are images
 textures = {
-    WALL : pygame.transform.scale(pygame.image.load('WALL copy.png'),
+    WALL : pygame.transform.scale(pygame.image.load('./textures/wall.png'),
     [TILESIZE, TILESIZE]),
-    TILE : pygame.transform.scale(pygame.image.load('TILE copy.png'),
+    TILE : pygame.transform.scale(pygame.image.load('./textures/tile.png'),
     [TILESIZE, TILESIZE]),
-    PLAYER: pygame.transform.scale(pygame.image.load('PLAYER copy.png'),
+    PLAYER: pygame.transform.scale(pygame.image.load('./textures/player.png'),
     [TILESIZE, TILESIZE]),
-    PORTAL : pygame.transform.scale(pygame.image.load('PORTAL copy.png'),
+    PORTAL : pygame.transform.scale(pygame.image.load('./textures/portal.png'),
     [TILESIZE, TILESIZE]),
 }
 
@@ -70,6 +70,7 @@ for line in currentMap:
             playerX = row
             playerY = column
         elif ch == '2':
+            tile(row, column)
             portal(row, column)
             portalX = row
             portalY = column
