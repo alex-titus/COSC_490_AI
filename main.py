@@ -17,8 +17,20 @@ def wall(wallX, wallY):
 def portal(portalX, portalY):
     display.blit(textures[PORTAL], (portalX*TILESIZE, portalY*TILESIZE))
 
+def updateclock(FPS, slowmode_enabled):
+    fpsClock.tick(FPS)
+    if slowmode_enabled == True:
+	    pygame.time.wait(50)
+
+filename = "firstmap.txt"
+slowmode = False
+
+for x in sys.argv:
+	if x == "-s":
+	    slowmode = True
+
 # Which map we are going to be opening
-currentMap = open("firstmap.txt", 'r')
+currentMap = open(filename, 'r')
 
 # Information about the map we are creating
 TILESIZE = 60
