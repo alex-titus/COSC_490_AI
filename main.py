@@ -1,4 +1,4 @@
-import pygame, time, sys
+import pygame, numpy, time, sys
 from pygame.locals import *
 import DecisionFactory
 
@@ -13,14 +13,26 @@ def tile(tileX, tileY):
 
 def wall(wallX, wallY):
     display.blit(textures[WALL], (wallX*TILESIZE, wallY*TILESIZE))
-    pygame.draw.rect(display, (0, 0, 0), [wallX, wallY, TILESIZE, TILESIZE], 1)
-    pygame.display.update()
 
 def portal(portalX, portalY):
     display.blit(textures[PORTAL], (portalX*TILESIZE, portalY*TILESIZE))
 
+def updateclock(FPS, slowmode_enabled):
+    fpsClock.tick(FPS)
+    if slowmode_enabled == True:
+	    pygame.time.wait(100)
+
+filename = "./maps/firstmap.txt"
+slowmode = False
+human = False
+
+for x in sys.argv:
+	if x == "-s":
+	    slowmode = True
+        if x == "-human":
+            human = True
 # Which map we are going to be opening
-currentMap = open("firstmap.txt", 'r')
+currentMap = open(filename, 'r')
 
 # Information about the map we are creating
 TILESIZE = 40
@@ -51,18 +63,19 @@ textures = {
 
 # Initializing pygame and creating the map
 pygame.init()
-display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))
-
 FPS = 60
 fpsClock = pygame.time.Clock()
+display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))
 
 # Map creation
+tilemap = numpy.zeros(shape=(MAPWIDTH, MAPHEIGHT), dtype=numpy.int16)
 column = 0
 for line in currentMap:
     row = 0
     for ch in line:
         if ch == '1':
             wall(row, column)
+            tilemap[column, row] = 1
         elif ch == '.':
             tile(row, column)
         elif ch == '0':
@@ -77,65 +90,75 @@ for line in currentMap:
         row += 1
     column += 1
 
-print("Player is at: (" + str(playerX) + ", " + str(playerY) + ")")
-print("Portal is at: (" + str(portalX) + ", " + str(portalY) + ")")
 steps = 0
+print(tilemap)
 while True:
     # Get all the user events
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
+            
+    # End Condition for ending the "game"
     if playerX == portalX:
         if playerY == portalY:
             print("Portal was found in : " + str(steps) + " steps.")
             pygame.quit()
             sys.exit()
 
+    if human == True:
         if event.type == KEYDOWN:
             if event.key == K_LEFT or event.key == ord('a'):
-                playerX -= 1
-                print("Player moved left to: X" + str(playerX) + " Y" + str(playerY))
+                if tilemap[playerY, playerX-1] == 1:
+                    print("failure left")
+                else:
+                    tile(playerX, playerY)
+                    playerX -= 1
             if event.key == K_RIGHT or event.key == ord('d'):
-                playerX += 1
-                print("Player moved right to: X" + str(playerX) + " Y" + str(playerY))
+                if tilemap[playerY, playerX+1] == 1:
+                    print("failure right")
+                else:
+                    playerX += 1
             if event.key == K_UP or event.key == ord('w'):
-                playerY -= 1
-                print("Player moved up to: X" + str(playerX) + " Y" + str(playerY))
+                if tilemap[playerY-1, playerX] == 1:
+                    print("failure up")
+                else:
+                    playerY -= 1
             if event.key == K_DOWN or event.key == ord('s'):
-                playerY += 1
-                print("Player moved down to: X" + str(playerX) + " Y" + str(playerY))
-
-    direction = AI.random_direction()
-    if direction == 'up':
-        if playerY >= 1:
-            if playerY == 1:
+                if tilemap[playerY+1, playerX] == 1:
+                    print("failure down")
+                else:
+                    playerY += 1
+    else:
+        direction = AI.random_direction()
+        if direction == 'up':
+            if tilemap[playerY-1, playerX] == 1:
                 steps += 1
+                print("failure up")
             else:
                 tile(playerX, playerY)
                 playerY -= 1
                 steps += 1
-    if direction == 'down':
-        if playerY <= 8:
-            if playerY == 8:
+        if direction == 'down':
+            if tilemap[playerY+1, playerX] == 1:
                 steps += 1
+                print("failure down")
             else:
                 tile(playerX, playerY)
                 playerY += 1
                 steps += 1
-    if direction == 'left':
-        if playerX >= 1:
-            if playerX == 1:
-                steps +=1
+        if direction == 'left':
+            if tilemap[playerY, playerX-1] == 1:
+                steps += 1
+                print("failure left")
             else:
                 tile(playerX, playerY)
                 playerX -= 1
                 steps += 1
-    if direction == 'right':
-        if playerX <= 8:
-            if playerX == 8:
+        if direction == 'right':
+            if tilemap[playerY, playerX+1] == 1:
                 steps += 1
+                print("failure right")
             else:
                 tile(playerX, playerY)
                 playerX += 1
@@ -143,4 +166,4 @@ while True:
 
     player(playerX, playerY)
     pygame.display.update()
-    fpsClock.tick(FPS)
+    updateclock(FPS, slowmode)
