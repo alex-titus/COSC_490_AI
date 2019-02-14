@@ -32,11 +32,15 @@ def up(playerX, playerY):
     if tilemap[playerY - 1, playerX] == 1:
         results = False
         print('Failure up')
+        player(playerX, playerY)
+        pygame.display.update()
         return results
     else:
         tile(playerX, playerY)
         results = True
         print(' Success up')
+        player(playerX, playerY)
+        pygame.display.update()
         return results
 
 
@@ -44,9 +48,13 @@ def down(playerX, playerY):
         if tilemap[playerY + 1, playerX] == 1:
             print("Failure down")
             results = False
+            player(playerX, playerY)
+            pygame.display.update()
             return results
         else:
             tile(playerX, playerY)
+            player(playerX, playerY)
+            pygame.display.update()
             print(playerY)
             results = True
             print("Success down")
@@ -57,9 +65,13 @@ def left(playerX, playerY):
     if tilemap[playerY, playerX - 1] == 1:
         results = False
         print("Failure left")
+        player(playerX, playerY)
+        pygame.display.update()
         return results
     else:
         tile(playerX, playerY)
+        player(playerX, playerY)
+        pygame.display.update()
         results = True
         print("Success left")
         return results
@@ -69,12 +81,18 @@ def right(playerX, playerY):
     if tilemap[playerY, playerX + 1] == 1:
         results = False
         print("Failure right")
+        player(playerX, playerY)
+        pygame.display.update()
         return results
     else:
         tile(playerX, playerY)
         results = True
         print("Success right")
+        player(playerX, playerY)
+        pygame.display.update()
         return results
+
+
 
 
 filename = "./maps/firstmap.txt"
@@ -230,6 +248,6 @@ while True:
                 success += 1
                 steps += 1
 
-    player(playerX, playerY)
-    pygame.display.update()
+    #player(playerX, playerY)
+    #pygame.display.update()
     updateclock(FPS, slowmode)
