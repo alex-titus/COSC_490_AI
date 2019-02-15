@@ -27,83 +27,80 @@ def updateclock(FPS, slowmode_enabled):
     if slowmode_enabled == True: pygame.time.wait(100)
 results = True
 
-
-def up(playerX, playerY):
-    if tilemap[playerY - 1, playerX] == 1:
-        results = False
-        print('Failure up')
-        player(playerX, playerY)
-        pygame.display.update()
-        return results
-    else:
-        tile(playerX, playerY)
-        results = True
-        print(' Success up')
-        player(playerX, playerY)
-        pygame.display.update()
-        return results
-
-
-def down(playerX, playerY):
-        if tilemap[playerY + 1, playerX] == 1:
-            print("Failure down")
-            results = False
-            player(playerX, playerY)
-            pygame.display.update()
-            return results
-        else:
-            tile(playerX, playerY)
-            player(playerX, playerY)
-            pygame.display.update()
-            print(playerY)
-            results = True
-            print("Success down")
-            return results
-
-
-def left(playerX, playerY):
-    if tilemap[playerY, playerX - 1] == 1:
-        results = False
-        print("Failure left")
-        player(playerX, playerY)
-        pygame.display.update()
-        return results
-    else:
-        tile(playerX, playerY)
-        player(playerX, playerY)
-        pygame.display.update()
-        results = True
-        print("Success left")
-        return results
-
-
-def right(playerX, playerY):
-    if tilemap[playerY, playerX + 1] == 1:
-        results = False
-        print("Failure right")
-        player(playerX, playerY)
-        pygame.display.update()
-        return results
-    else:
-        tile(playerX, playerY)
-        results = True
-        print("Success right")
-        player(playerX, playerY)
-        pygame.display.update()
-        return results
-
-
-
-
 filename = "./maps/firstmap.txt"
-slowmode = True
+slowmode = False
 human = False
 
 for x in sys.argv:
     if x == "-s":
         slowmode = True
-        if x == "-human":
-            human = True
+    if x == "-human":
+        human = True
+
+def attemptUp(playerX, playerY):
+    if tilemap[playerY - 1, playerX] == 1:
+        results = False
+        print("Failure: Up")
+        return results
+    else:
+        results = True
+        print("Success: Up")
+        return results
+
+def attemptDown(playerX, playerY):
+    if tilemap[playerY + 1, playerX] == 1:
+        results = False
+        print("Failure: Down")
+        return results
+    else:
+        results = True
+        print("Success: Down")
+        return results
+
+def attemptleft(playerX, playerY):
+    if tilemap[playerY, playerX - 1] == 1:
+        results = False
+        print("Failure: Left")
+        return results
+    else:
+        results = True
+        print("Success: Left")
+        return results
+
+def attemptright(playerX, playerY):
+    if tilemap[playerY, playerX + 1] == 1:
+        results = False
+        print("Failure: Right")
+        return results
+    else:
+        results = True
+        print("Success: Right")
+        return results
+
+def up(playerX, playerY):
+    results = attemptUp(playerX, playerY)
+    if results:
+        tile(playerX, playerY)
+    return results
+
+def down(playerX, playerY):
+    results = attemptDown(playerX, playerY)
+    if results:
+        tile(playerX, playerY)
+    return results
+
+def left(playerX, playerY):
+    results = attemptleft(playerX, playerY)
+    if results:
+        tile(playerX, playerY)
+    return results
+
+def right(playerX, playerY):
+    results = attemptright(playerX, playerY)
+    if results:
+        tile(playerX, playerY)
+    return results
+
 # Which map we are going to be opening
 currentMap = open(filename, 'r')
 
@@ -136,7 +133,7 @@ textures = {
 
 # Initializing pygame and creating the map
 pygame.init()
-FPS = 60
+FPS = 24
 fpsClock = pygame.time.Clock()  # type: None
 display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
 
@@ -175,7 +172,7 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-            
+
     # End Condition for ending the "game"
     if playerX == portalX:
         if playerY == portalY:
@@ -188,25 +185,20 @@ while True:
     if human is True:
         if event.type == KEYDOWN:
             if event.key == K_LEFT or event.key == ord('a'):
-                if tilemap[playerY, playerX-1] == 1:
-                    print("failure left")
-                else:
-                    tile(playerX, playerY)
+                results = left(playerX, playerY)
+                if results:
                     playerX -= 1
             if event.key == K_RIGHT or event.key == ord('d'):
-                if tilemap[playerY, playerX+1] == 1:
-                    print("failure right")
-                else:
+                results = right(playerX, playerY)
+                if results:
                     playerX += 1
             if event.key == K_UP or event.key == ord('w'):
-                if tilemap[playerY-1, playerX] == 1:
-                    print("failure up")
-                else:
+                results = up(playerX, playerY)
+                if results:
                     playerY -= 1
             if event.key == K_DOWN or event.key == ord('s'):
-                if tilemap[playerY+1, playerX] == 1:
-                    print("failure down")
-                else:
+                results = down(playerX, playerY)
+                if results:
                     playerY += 1
     else:
         direction = AI.random_direction()
@@ -225,7 +217,6 @@ while True:
                 steps += 1
                 fail += 1
             else:
-                print()
                 playerY += 1
                 success += 1
                 steps += 1
@@ -248,6 +239,6 @@ while True:
                 success += 1
                 steps += 1
 
-    #player(playerX, playerY)
-    #pygame.display.update()
+    player(playerX, playerY)
+    pygame.display.update()
     updateclock(FPS, slowmode)

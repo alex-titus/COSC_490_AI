@@ -92,13 +92,14 @@ for line in currentMap:
 
 steps = 0
 print(tilemap)
+
 while True:
     # Get all the user events
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-            
+
     # End Condition for ending the "game"
     if playerX == portalX:
         if playerY == portalY:
@@ -118,16 +119,19 @@ while True:
                 if tilemap[playerY, playerX+1] == 1:
                     print("failure right")
                 else:
+                    tile(playerX, playerY)
                     playerX += 1
             if event.key == K_UP or event.key == ord('w'):
                 if tilemap[playerY-1, playerX] == 1:
                     print("failure up")
                 else:
+                    tile(playerX, playerY)
                     playerY -= 1
             if event.key == K_DOWN or event.key == ord('s'):
                 if tilemap[playerY+1, playerX] == 1:
                     print("failure down")
                 else:
+                    tile(playerX, playerY)
                     playerY += 1
     else:
         direction = AI.random_direction()
