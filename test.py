@@ -2,9 +2,6 @@ import pygame, numpy, time, sys
 from pygame.locals import *
 import DecisionFactory
 
-# THE COMPUTER IS ALIVE!
-AI = DecisionFactory.DecisionFactory()
-
 
 def player(playerX, playerY):
     display.blit(textures[PLAYER], (playerX*TILESIZE, playerY*TILESIZE))
@@ -166,6 +163,9 @@ success = 0
 print(tilemap)
 
 
+# THE COMPUTER IS ALIVE!
+AI = DecisionFactory.DecisionFactory()
+
 while True:
     # Get all the user events
     for event in pygame.event.get():
@@ -201,7 +201,7 @@ while True:
                 if results:
                     playerY += 1
     else:
-        direction = AI.random_direction()
+        direction = AI.get_decision()
         if direction == 'up':
             results = up(playerX, playerY)
             if results is False:
@@ -238,6 +238,8 @@ while True:
                 playerX += 1
                 success += 1
                 steps += 1
+
+    AI.put_result(results)
 
     player(playerX, playerY)
     pygame.display.update()

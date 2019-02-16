@@ -1,4 +1,5 @@
 import random
+import numpy
 #import numpy as np
 
 class DecisionFactory:
@@ -15,9 +16,18 @@ class DecisionFactory:
     def get_decision(self, verbose = True):
         return self.random_direction()
 
+    def check_decision(self, dir):
+        if dir == self.last_direction:
+            if self.last_result is False:
+                return False
+        return True
+
     def random_direction(self):
         #r = random.randint(0, 4)
         r = random.randint(1, 4)
+        dir = self.directions[r]
+        while self.check_decision(r) is False:
+            r = random.randint(1, 4)
 
         self.last_direction = self.directions[r]
 
