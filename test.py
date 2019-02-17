@@ -201,7 +201,8 @@ while True:
                 if results:
                     playerY += 1
     else:
-        direction = AI.get_decision()
+        direction = AI.get_decision(playerX, playerY)
+        print('(' + str(playerX) + ", " + str(playerY) + ')')
         if direction == 'up':
             results = up(playerX, playerY)
             if results is False:
@@ -239,7 +240,7 @@ while True:
                 success += 1
                 steps += 1
 
-    AI.put_result(results)
+    AI.put_result(playerX, playerY, results)
 
     player(playerX, playerY)
     pygame.display.update()
