@@ -98,6 +98,48 @@ def right(playerX, playerY):
         tile(playerX, playerY)
     return results
 
+def movePlayer(direction, playerX, player)
+    if direction == 'left':
+        if tilemap[playerY, playerX - 1] == 1:
+            results = False
+            print("Failure: Left")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Left")
+            return results
+    if direction == 'right':
+        if tilemap[playerY, playerX - 1] == 1:
+            results = False
+            print("Failure: Right")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Right")
+            return results
+    if direction == 'Up':
+        if tilemap[playerY - 1, playerX] == 1:
+            results = False
+            print("Failure: Up")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Up")
+            return results
+    if direction == 'down':
+        if tilemap[playerY + 1, playerX] == 1:
+            results = False
+            print("Failure: Down")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Down")
+            return results
+
 # Which map we are going to be opening
 currentMap = open(filename, 'r')
 
