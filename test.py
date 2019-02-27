@@ -98,7 +98,7 @@ def right(playerX, playerY):
         tile(playerX, playerY)
     return results
 
-def movePlayer(direction, playerX, player)
+def movePlayer(direction, playerX, playerY)
     if direction == 'left':
         if tilemap[playerY, playerX - 1] == 1:
             results = False
