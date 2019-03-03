@@ -2,7 +2,7 @@
 from enum import Enum
 
 class TileType(Enum):
-    unknown = 0
-    tile = 1
-    portal = 2
+    white = 0
+    gray = 1
+    black = 2
     wall = 3

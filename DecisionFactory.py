@@ -33,21 +33,26 @@ class DecisionFactory:
 
     def smart_direction(self, x, y):
         options = list(self.directions)
+        print("Available Decisions " + str(options))
         self.memory.remove_bad_choices(x, y, options)
-        size = len(options)-1
+        print("Moveable Decisions " + str(options))
+        self.memory.remove_grayblack_choices(x, y, options)
+        print("Smart Decisions " + str(options))
+        size = len(options)
         if size == 1:
             dir = self.random_direction()
             self.last_direction = dir
             return dir
         else:
-            r = random.randint(1, size)
+            r = random.randint(1, size-1)
             dir = options[r]
             while self.check_decision(r) is False:
-                r = random.randint(1, size)
+                r = random.randint(1, size-1)
 
             self.last_direction = dir
 
             return dir
+        print()
 
     def put_result(self, x, y, result):
         self.last_result = result

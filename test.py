@@ -98,7 +98,7 @@ def right(playerX, playerY):
         tile(playerX, playerY)
     return results
 
-def movePlayer(direction, playerX, playerY)
+def movePlayer(direction, playerX, playerY):
     if direction == 'left':
         if tilemap[playerY, playerX - 1] == 1:
             results = False
@@ -247,6 +247,7 @@ while True:
         print('(' + str(playerX) + ", " + str(playerY) + ')')
         if direction == 'up':
             results = up(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -256,6 +257,7 @@ while True:
                 success += 1
         if direction == 'down':
             results = down(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -265,6 +267,7 @@ while True:
                 steps += 1
         if direction == 'left':
             results = left(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -274,6 +277,7 @@ while True:
                 steps += 1
         if direction == 'right':
             results = right(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -281,8 +285,6 @@ while True:
                 playerX += 1
                 success += 1
                 steps += 1
-
-    AI.put_result(playerX, playerY, results)
 
     player(playerX, playerY)
     pygame.display.update()
