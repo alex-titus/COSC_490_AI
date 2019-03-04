@@ -8,8 +8,8 @@ class TravelPath:
         self.pathlength = 0
         self.adjacents = []
 
-    def addtoPath(self, dx, dy):
-        self.path.append([dx, dy])
+    def push(self, direction):
+        self.path.append(direction)
         self.pathlength += 1
 
     def pop(self):

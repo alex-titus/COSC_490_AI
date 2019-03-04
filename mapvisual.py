@@ -4,7 +4,7 @@ from Enums import *
 from pygame.locals import *
 import DecisionFactory
 
-filename = "./maps/firstmap.txt"
+filename = "./maps/bigmaze.txt"
 slowmode = False
 results = True
 
@@ -16,9 +16,9 @@ for x in sys.argv:
 currentMap = open(filename, 'r')
 
 # Information about the map we are creating
-TILESIZE = 40
-MAPWIDTH = 10
-MAPHEIGHT = 10
+TILESIZE = 30
+MAPWIDTH = 37
+MAPHEIGHT = 37
 
 #Setting up numbers to keep track
 RED = 0
@@ -130,24 +130,24 @@ def right(playerX, playerY):
     #    tile(playerX, playerY)
     return results
 
-def paintmap():
-    y = 0
-    for row in AI.memory.map:
-        x = 0
-        for col in row:
-            if AI.memory.map[x][y] == TileType.white:
-                whitetile(x, y)
-            elif AI.memory.map[x][y] == TileType.gray:
-                graytile(x, y)
-            elif AI.memory.map[x][y] == TileType.black:
-                blacktile(x, y)
-            elif AI.memory.map[x][y] == TileType.wall:
-                redtile(x, y)
-            else:
-                sys.exit()
-            x += 1
-        y += 1
+def paintmapold():
 
+def paintmap():
+    spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1]]
+    for spot in spots:
+        x = spot[0]
+        y = spot[1]
+        AI.memory.expand_if_needed(x, y)
+        if AI.memory.map[x][y] == TileType.white:
+            whitetile(x, y)
+        elif AI.memory.map[x][y] == TileType.gray:
+            graytile(x, y)
+        elif AI.memory.map[x][y] == TileType.black:
+            blacktile(x, y)
+        elif AI.memory.map[x][y] == TileType.wall:
+            redtile(x, y)
+        else:
+            sys.exit()
 
 # Initializing pygame and creating the map
 pygame.init()
@@ -243,3 +243,4 @@ while True:
     player(playerX, playerY)
     pygame.display.update()
     updateclock(FPS, slowmode)
+    print("\n")

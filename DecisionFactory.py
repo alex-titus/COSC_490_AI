@@ -1,8 +1,7 @@
 import random
 import numpy
 import MemoryMap
-
-#import numpy as np
+import TravelPath
 
 class DecisionFactory:
     def __init__(self, name = 'Joe'):
@@ -11,6 +10,8 @@ class DecisionFactory:
         self.last_result = 'success'
         self.last_direction = 'wait'
         self.memory = MemoryMap.MemoryMap()
+        self.path = TravelPath.TravelPath()
+        self.backtravelling = False
 
         # Note: we have relativisitic coordinates recorded here, since the map
         # is relative to the players first known recorded position:
@@ -38,11 +39,22 @@ class DecisionFactory:
         print("Moveable Decisions " + str(options))
         self.memory.remove_grayblack_choices(x, y, options)
         print("Smart Decisions " + str(options))
+        print("Travel Path: " + str(self.path.path))
         size = len(options)
         if size == 1:
-            dir = self.random_direction()
+            self.backtravelling = True
+            print("No White Spaces. Back-travelling...")
+            dir = self.path.pop()
+            print("Last Direction: " + dir)
+            if dir == 'left':
+                dir = 'right'
+            elif dir == 'up':
+                dir = 'down'
+            elif dir == 'right':
+                dir = 'left'
+            elif dir == 'down':
+                dir = 'up'
             self.last_direction = dir
-            return dir
         else:
             r = random.randint(1, size-1)
             dir = options[r]
@@ -51,9 +63,13 @@ class DecisionFactory:
 
             self.last_direction = dir
 
-            return dir
-        print()
+        print("Direction: " + dir + "\n")
+        return dir
 
     def put_result(self, x, y, result):
         self.last_result = result
         self.memory.memorize(x, y, self.last_direction, self.last_result)
+        if self.last_result is True and self.backtravelling is False:
+            self.path.push(self.last_direction)
+        elif self.backtravelling is True:
+            self.backtravelling = False
