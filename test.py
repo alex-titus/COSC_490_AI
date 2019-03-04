@@ -145,16 +145,16 @@ currentMap = open(filename, 'r')
 
 # Information about the map we are creating
 TILESIZE = 40
-MAPWIDTH = 10
-MAPHEIGHT = 10
+MAPWIDTH = 0
+MAPHEIGHT = 0
 
 #Setting up numbers to keep track
 WALL = 0
 TILE = 1
 PLAYER = 2
 PORTAL = 3
-playerX = 0
-playerY = 0
+playerX = 1
+playerY = 1
 portalX = 0
 portalY = 0
 
@@ -170,40 +170,36 @@ textures = {
                                    [TILESIZE, TILESIZE]),
 }
 
-# Initializing pygame and creating the map
-pygame.init()
-FPS = 24
-fpsClock = pygame.time.Clock()  # type: None
-display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
-
 # Map creation
-tilemap = numpy.zeros(shape=(MAPWIDTH, MAPHEIGHT), dtype=numpy.int16)
-column = 0
+tilemap = []
 for line in currentMap:
-    row = 0
+    tilemap.append([])
     for ch in line:
         if ch == '1':
-            wall(row, column)
-            tilemap[column, row] = 1
+            tilemap[MAPHEIGHT].append(1)
         elif ch == '.':
-            tile(row, column)
+            tilemap[MAPHEIGHT].append(0)
         elif ch == '0':
-            tile(row, column)
-            playerX = row
-            playerY = column
+            playerX = MAPWIDTH
+            playerY = MAPHEIGHT
         elif ch == '2':
-            tile(row, column)
-            portal(row, column)
-            portalX = row
-            portalY = column
-        row += 1
-    column += 1
+            portalX = MAPWIDTH
+            portalY = MAPHEIGHT
+        MAPWIDTH += 1
+    MAPHEIGHT += 1
 
 steps = 0
 fail = 0
 success = 0
 print(tilemap)
 
+
+
+# Initializing pygame and creating the map
+pygame.init()
+FPS = 24
+fpsClock = pygame.time.Clock()  # type: None
+display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
 
 # THE COMPUTER IS ALIVE!
 AI = DecisionFactory.DecisionFactory()

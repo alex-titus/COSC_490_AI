@@ -12,10 +12,10 @@ class DecisionFactory:
         self.memory = MemoryMap.MemoryMap()
         self.path = TravelPath.TravelPath()
         self.backtravelling = False
-
         # Note: we have relativisitic coordinates recorded here, since the map
         # is relative to the players first known recorded position:
         # self.state.pos = (0, 0)
+        random.seed(random.randint(1, 5000))
 
     def get_decision(self, x, y, verbose = True):
         return self.smart_direction(x, y) #self.random_direction()

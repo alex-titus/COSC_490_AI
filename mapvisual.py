@@ -27,8 +27,8 @@ GRAY = 2
 BLACK = 3
 PLAYER = 4
 #PORTAL = 5
-playerX = 0
-playerY = 0
+playerX = 1
+playerY = 1
 portalX = 0
 portalY = 0
 
@@ -129,8 +129,6 @@ def right(playerX, playerY):
     #if results:
     #    tile(playerX, playerY)
     return results
-
-def paintmapold():
 
 def paintmap():
     spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1]]
