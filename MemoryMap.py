@@ -16,7 +16,6 @@ class MemoryMap:
                 self.map[a].append(TileType.white)
                 b += 1
             a += 1
-        self.map[1][1] = TileType.gray
 
     def expandMap(self, var = 0):
         a = 0
@@ -120,6 +119,8 @@ class MemoryMap:
                 self.map[x][y+1] = TileType.gray
             elif result == False:
                 self.map[x][y+1] = TileType.wall
+        elif direction == 'wait':
+            self.map[x][y] = TileType.gray
 
     def rememberWalls(self, x, y, direction):
         self.expand_if_needed(x, y)

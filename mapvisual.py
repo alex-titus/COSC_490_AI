@@ -135,14 +135,14 @@ def paintmap():
     for spot in spots:
         x = spot[0]
         y = spot[1]
-        AI.memory.expand_if_needed(x, y)
-        if AI.memory.map[x][y] == TileType.white:
+        AI.mind.map.expand_if_needed(x, y)
+        if AI.mind.map.map[x][y] == TileType.white:
             whitetile(x, y)
-        elif AI.memory.map[x][y] == TileType.gray:
+        elif AI.mind.map.map[x][y] == TileType.gray:
             graytile(x, y)
-        elif AI.memory.map[x][y] == TileType.black:
+        elif AI.mind.map.map[x][y] == TileType.black:
             blacktile(x, y)
-        elif AI.memory.map[x][y] == TileType.wall:
+        elif AI.mind.map.map[x][y] == TileType.wall:
             redtile(x, y)
         else:
             sys.exit()
@@ -198,11 +198,12 @@ while True:
             pygame.quit()
             sys.exit()
 
-    direction = AI.get_decision(playerX, playerY)
+    direction = AI.get_decision()
     print('(' + str(playerX) + ", " + str(playerY) + ')')
+    print('(' + str(AI.mind.relX) + ", " + str(AI.mind.relY) + ')')
     if direction == 'up':
         results = up(playerX, playerY)
-        AI.put_result(playerX, playerY, results)
+        AI.put_result(results)
         if results is False:
             fail += 1
         else:
@@ -211,7 +212,7 @@ while True:
         steps += 1
     if direction == 'down':
         results = down(playerX, playerY)
-        AI.put_result(playerX, playerY, results)
+        AI.put_result(results)
         if results is False:
             fail += 1
         else:
@@ -220,7 +221,7 @@ while True:
         steps += 1
     if direction == 'left':
         results = left(playerX, playerY)
-        AI.put_result(playerX, playerY, results)
+        AI.put_result(results)
         if results is False:
             fail += 1
         else:
@@ -229,7 +230,7 @@ while True:
         steps += 1
     if direction == 'right':
         results = right(playerX, playerY)
-        AI.put_result(playerX, playerY, results)
+        AI.put_result(results)
         if results is False:
             fail += 1
         else:
