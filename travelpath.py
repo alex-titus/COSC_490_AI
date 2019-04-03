@@ -16,3 +16,6 @@ class TravelPath:
         if self.pathlength >= 1:
             self.pathlength -= 1
             return self.path.pop()
+        else:
+            print("Error: Path too short")
+            return None

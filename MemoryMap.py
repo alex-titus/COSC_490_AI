@@ -78,21 +78,21 @@ class MemoryMap:
             print row
 
     def auditTile(self, x, y):
-        adjacents = {self.map[x-1][y], self.map[x][y-1], self.map[x+1][y], self.map[x][y+1]}
+        adjacents = [self.map[x-1][y], self.map[x][y-1], self.map[x+1][y], self.map[x][y+1]]
+        wallblackcount = 0
         if self.map[x][y] == TileType.gray:
             wallblackcount = 0
             for tile in adjacents:
                  if tile == TileType.wall or tile == TileType.black:
                      wallblackcount += 1
-
         return wallblackcount >= 3
 
     def audit(self):
-        y = 0
-        for col in self.map:
-            x = 0
-            for row in col:
-                if auditTile(x, y):
+        y = 1#0
+        while y < len(self.map)-1:#for col in self.map:
+            x = 1#0
+            while x < len(self.map[0])-1:#for row in col:
+                if self.auditTile(x, y):
                     self.map[x][y] = TileType.black
                 x += 1
             y += 1
@@ -102,25 +102,34 @@ class MemoryMap:
         if direction == 'left':
             if result == True:
                 self.map[x-1][y] = TileType.gray
+                #if self.auditTile(x, y):
+                #    self.map[x-1][y] = TileType.black
             elif result == False:
                 self.map[x-1][y] = TileType.wall
         elif direction == 'up':
             if result == True:
                 self.map[x][y-1] = TileType.gray
+                #if self.auditTile(x, y):
+                #    self.map[x][y-1] = TileType.black
             elif result == False:
                 self.map[x][y-1] = TileType.wall
         elif direction == 'right':
             if result == True:
                 self.map[x+1][y] = TileType.gray
+                #if self.auditTile(x, y):
+                #    self.map[x+1][y] = TileType.black
             elif result == False:
                 self.map[x+1][y] = TileType.wall
         elif direction == 'down':
             if result == True:
                 self.map[x][y+1] = TileType.gray
+                #if self.auditTile(x, y):
+                #    self.map[x][y+1] = TileType.black
             elif result == False:
                 self.map[x][y+1] = TileType.wall
         elif direction == 'wait':
             self.map[x][y] = TileType.gray
+        self.audit()
 
     def rememberWalls(self, x, y, direction):
         self.expand_if_needed(x, y)

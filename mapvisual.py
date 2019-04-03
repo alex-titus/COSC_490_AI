@@ -4,7 +4,7 @@ from Enums import *
 from pygame.locals import *
 import DecisionFactory
 
-filename = "./maps/bigmaze.txt"
+filename = "./maps/rooms.txt"
 slowmode = False
 results = True
 
@@ -17,8 +17,8 @@ currentMap = open(filename, 'r')
 
 # Information about the map we are creating
 TILESIZE = 30
-MAPWIDTH = 37
-MAPHEIGHT = 37
+MAPWIDTH = 20
+MAPHEIGHT = 15
 
 #Setting up numbers to keep track
 RED = 0
@@ -27,8 +27,12 @@ GRAY = 2
 BLACK = 3
 PLAYER = 4
 #PORTAL = 5
-playerX = 1
-playerY = 1
+startX = 1
+startY = 1
+playerX = startX
+playerY = startY
+dx = 0
+dy = 0
 portalX = 0
 portalY = 0
 
@@ -136,13 +140,13 @@ def paintmap():
         x = spot[0]
         y = spot[1]
         AI.mind.map.expand_if_needed(x, y)
-        if AI.mind.map.map[x][y] == TileType.white:
+        if AI.mind.map.map[x+dx][y+dy] == TileType.white:
             whitetile(x, y)
-        elif AI.mind.map.map[x][y] == TileType.gray:
+        elif AI.mind.map.map[x+dx][y+dy] == TileType.gray:
             graytile(x, y)
-        elif AI.mind.map.map[x][y] == TileType.black:
+        elif AI.mind.map.map[x+dx][y+dy] == TileType.black:
             blacktile(x, y)
-        elif AI.mind.map.map[x][y] == TileType.wall:
+        elif AI.mind.map.map[x+dx][y+dy] == TileType.wall:
             redtile(x, y)
         else:
             sys.exit()
@@ -154,25 +158,25 @@ fpsClock = pygame.time.Clock()  # type: None
 display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
 
 # Map creation
-tilemap = numpy.zeros(shape=(MAPWIDTH, MAPHEIGHT), dtype=numpy.int16)
-column = 0
+tilemap = numpy.zeros(shape=(MAPHEIGHT, MAPWIDTH), dtype=numpy.int16)
+row = 0
 for line in currentMap:
-    row = 0
+    column = 0
     for ch in line:
-        whitetile(row, column)
+        whitetile(column, row)
         if ch == '1':
-            tilemap[column, row] = 1
+            tilemap[row, column] = 1
         #elif ch == '.':
         #    tile(row, column)
         elif ch == '0':
-            playerX = row
-            playerY = column
+            playerX = column
+            playerY = row
         elif ch == '2':
             #portal(row, column)
-            portalX = row
-            portalY = column
-        row += 1
-    column += 1
+            portalX = column
+            portalY = row
+        column += 1
+    row += 1
 
 steps = 0
 fail = 0
@@ -181,6 +185,8 @@ print(tilemap)
 
 # THE COMPUTER IS ALIVE!
 AI = DecisionFactory.DecisionFactory()
+dx = AI.mind.relX - playerX
+dy = AI.mind.relY - playerY
 
 while True:
     # Get all the user events
@@ -195,6 +201,7 @@ while True:
             print("Portal was found in : " + str(steps) + " steps.")
             print("Failed steps: " + str(fail) + " steps. ")
             print("Succesful steps: " + str(success) + " steps.")
+            print("Final Mind Map")
             pygame.quit()
             sys.exit()
 

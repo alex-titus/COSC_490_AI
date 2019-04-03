@@ -1,6 +1,7 @@
 import numpy
 from Enums import *
 import MemoryMap
+import PathMemory
 import TravelPath
 
 class Mind:
@@ -11,6 +12,11 @@ class Mind:
         self.relY = 1#(self.map.sizeY + 1)/2
         self.map.memorize(self.relX, self.relY, 'wait', True)
         self.path = TravelPath.TravelPath()
+        self.pathMem = PathMemory.PathMemory()
+        self.recentWhiteAdjacents = TravelPath.TravelPath()
+
+    def __del__(self):
+        self.pathMem.update(self.path)
 
     def move(self, direction):
         if direction == 'left':
