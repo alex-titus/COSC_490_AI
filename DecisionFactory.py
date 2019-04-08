@@ -91,7 +91,6 @@ class MemoryMap:
 			self.expandMap()
 			self.forX += self.sizeX/4
 			self.forY += self.sizeY/4
-			#self.print_tilemap
 			self.expand_if_needed(x, y)
 			self.recentlyExpanded = True
 		return expanded
@@ -131,7 +130,7 @@ class MemoryMap:
 			y += 1
 
 	def memorize(self, x, y, direction, result):
-		print("MEMORIZING: " + str(x) + " " + str(y) + " " + direction + " " + str(result))
+		#print("MEMORIZING: " + str(x) + " " + str(y) + " " + direction + " " + str(result))
 		self.expand_if_needed(x, y)
 		if direction == 'left':
 			if result == True:
@@ -168,7 +167,7 @@ class MemoryMap:
 		elif direction == 'wait':
 			self.map[y+self.forY][x+self.forX] = TileType.gray
 			#print("Updated TILE: " + str(self.map[y][x]))
-		self.print_tilemap()
+		#self.print_tilemap()
 		#self.audit()
 
 	def rememberWalls(self, x, y, direction):
@@ -421,7 +420,7 @@ class DecisionFactory:
 
 	def get_decision(self, verbose = True):
 		if self.following:
-			print(self.mind.pathMem.lastPath.path)
+			#print(self.mind.pathMem.lastPath.path)
 			dir = self.mind.pathMem.lastPath.pop()
 		else:
 			dir = self.smart_direction()

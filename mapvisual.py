@@ -1,5 +1,5 @@
 import pygame, numpy, time, sys
-import MemoryMap
+from DecisionFactory import MemoryMap
 from DecisionFactory import TileType
 from pygame.locals import *
 import DecisionFactory
@@ -139,7 +139,7 @@ def paintmap():
 		AI.mind.map.expand_if_needed(x+dx, y+dy)
 		#AI.mind.relX += AI.mind.map.sizeX/4
 		#AI.mind.relY += AI.mind.map.sizeY/4
-		print(AI.mind.map.get(x+dx, y+dy).value)
+		#print(AI.mind.map.get(x+dx, y+dy).value)
 		if AI.mind.map.get(x+dx, y+dy) == TileType.white:
 			whitetile(x, y)
 		elif AI.mind.map.get(x+dx, y+dy) == TileType.gray:
