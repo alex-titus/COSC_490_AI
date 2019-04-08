@@ -1,6 +1,7 @@
 import random
 import numpy
 
+import os
 from enum import Enum
 
 class TileType(Enum):
@@ -110,9 +111,9 @@ class MemoryMap:
 		print("")
 
 	def auditTile(self, x, y):
-		adjacents = {self.map[y-1][x], self.map[y][x-1], self.map[y+1][x], self.map[y][x+1]}
+		adjacents = [self.map[x-1][y], self.map[x][y-1], self.map[x+1][y], self.map[x][y+1]]
+		wallblackcount = 0
 		if self.map[y][x] == TileType.gray:
-			wallblackcount = 0
 			for tile in adjacents:
 				 if tile == TileType.wall or tile == TileType.black:
 					 wallblackcount += 1
@@ -120,11 +121,11 @@ class MemoryMap:
 		return wallblackcount >= 3
 
 	def audit(self):
-		y = 0
-		for col in self.map:
-			x = 0
-			for row in col:
-				if auditTile(x, y):
+		y = 1#0
+		while y < len(self.map)-1:#for col in self.map:
+			x = 1#0
+			while x < len(self.map[0])-1:#for row in col:
+				if self.auditTile(x, y):
 					self.map[y][x] = TileType.black
 				x += 1
 			y += 1
@@ -135,24 +136,32 @@ class MemoryMap:
 		if direction == 'left':
 			if result == True:
 				self.map[y+self.forY][x+self.forX-1] = TileType.gray
+				#if self.auditTile(x, y):
+				#	self.map[x-1][y] = TileType.black
 			elif result == False:
 				self.map[y+self.forY][x+self.forX-1] = TileType.wall
 			#print("Updated TILE: " + str(self.map[x-1][y]))
 		elif direction == 'up':
 			if result == True:
 				self.map[y+self.forY-1][x+self.forX] = TileType.gray
+				#if self.auditTile(x, y):
+				#	self.map[x-1][y] = TileType.black
 			elif result == False:
 				self.map[y+self.forY-1][x+self.forX] = TileType.wall
 			#print("Updated TILE: " + str(self.map[x][y-1]))
 		elif direction == 'right':
 			if result == True:
 				self.map[y+self.forY][x+self.forX+1] = TileType.gray
+				#if self.auditTile(x, y):
+				#	self.map[x-1][y] = TileType.black
 			elif result == False:
 				self.map[y+self.forY][x+self.forX+1] = TileType.wall
 			#print("Updated TILE: " + str(self.map[x+1][y]))
 		elif direction == 'down':
 			if result == True:
 				self.map[y+self.forY+1][x+self.forX] = TileType.gray
+				#if self.auditTile(x, y):
+				#	self.map[x-1][y] = TileType.black
 			elif result == False:
 				self.map[y+self.forY+1][x+self.forX] = TileType.wall
 			#print("Updated TILE: " + str(self.map[y+1][x]))
@@ -160,6 +169,7 @@ class MemoryMap:
 			self.map[y+self.forY][x+self.forX] = TileType.gray
 			#print("Updated TILE: " + str(self.map[y][x]))
 		self.print_tilemap()
+		#self.audit()
 
 	def rememberWalls(self, x, y, direction):
 		self.expand_if_needed(x, y)
@@ -262,6 +272,94 @@ class TravelPath:
 		if self.pathlength >= 1:
 			self.pathlength -= 1
 			return self.path.pop()
+		else:
+			print("Error: Path too short")
+			return None
+
+class PathMemory:
+	def __init__(self, name = 'Joe', fp = 'paths', mem = 'last.txt'):
+		self.name = name
+		self.folder = fp
+		self.file = mem
+		self.dir = self.folder + "/" + self.file
+		self.memoryExists = False
+		self.lastPath = TravelPath()
+
+		if not os.path.exists(self.folder):
+			print("No memory directory found.")
+			try:
+				os.mkdir(self.folder)
+				print("Directory: " + self.folder + " created")
+			except OSError:
+				print("Directory: " , self.folder ,  " could not be created. Exitting...")
+				sys.exit()
+		else:
+			print("Memory directory found: " + self.folder)
+
+		if not os.path.exists(self.dir):
+			print("No memory file found.")
+			try:
+				open(self.dir, 'w+')
+				print("File: " + self.file + " created")
+			except OSError:
+				print("File: " + self.file + " could not be created. Exitting...")
+				sys.exit()
+		else:
+			self.memoryExists = True
+			print("Memory file found: " + self.dir)
+		if self.memoryExists:
+			self.read()
+			self.shorten()
+
+
+	def update(self, tpath):
+		f = open(self.dir, 'w')
+		#f.write(str(x) + "\n")
+		#f.write(str(y) + "\n")
+		path = tpath.path
+		while len(path) > 0:
+			f.write(path[0] + "\n")
+			path = path[1:]
+		f.close()
+
+	def read(self):
+		path = TravelPath()
+		f = open(self.dir, 'r')
+		path.path = f.read().splitlines()
+		f.close()
+
+		path.pathlength = len(path.path)
+		print(path.path)
+		print(path.pathlength)
+		path.path = path.path[::-1]
+		self.lastPath = path
+		if self.lastPath.pathlength == 0:
+			self.memoryExists = False
+
+	def shorten(self):
+		def shortenable(a, b, c):
+			print(a + " " + b + " " + c)
+			if a == 'down' and c == 'up' and (b == 'left' or b == 'right'):
+				return True
+			elif a == 'up' and c == 'down' and (b == 'left' or b == 'right'):
+				return True
+			elif a == 'left' and c == 'right' and (b == 'up' or b == 'down'):
+				return True
+			elif a == 'right' and c == 'left' and (b == 'up' or b == 'down'):
+				return True
+			return 	
+		shortcut = self.lastPath.path[:]
+		a = 0
+		while a < len(shortcut) - 2 and len(shortcut) >= 3:
+			if shortenable(shortcut[a], shortcut[a+1], shortcut[a+2]):
+				print(True)
+				shortcut = shortcut[0:a] + shortcut[a+1:a+2] + shortcut[a+3:]
+			else:
+				a += 1
+		print("Pre-shortened Previous Path: " + str(self.lastPath.path))
+		self.lastPath.path = shortcut
+		self.lastPath.pathlength = len(shortcut)
+		print("Shortened: Path: " + str(self.lastPath.path))
 
 class Mind:
 	def __init__(self, name = 'Joe'):
@@ -271,6 +369,11 @@ class Mind:
 		self.relY = (self.map.sizeY + 1)/2
 		self.map.memorize(self.relX, self.relY, 'wait', True)
 		self.path = TravelPath()
+		self.pathMem = PathMemory()
+		self.recentWhiteAdjacents = TravelPath()
+
+	def __del__(self):
+		self.pathMem.update(self.path)
 
 	def move(self, direction):
 		if direction == 'left':
@@ -310,13 +413,21 @@ class DecisionFactory:
 		self.last_direction = 'wait'
 		self.mind = Mind()
 		self.backtravelling = False
+		self.following = self.mind.pathMem.memoryExists
 		# Note: we have relativisitic coordinates recorded here, since the map
 		# is relative to the players first known recorded position:
 		# self.state.pos = (0, 0)
 		random.seed(random.randint(1, 5000))
 
 	def get_decision(self, verbose = True):
-		return self.smart_direction() #self.random_direction()
+		if self.following:
+			print(self.mind.pathMem.lastPath.path)
+			dir = self.mind.pathMem.lastPath.pop()
+		else:
+			dir = self.smart_direction()
+		self.last_direction = dir
+		print("Direction: " + str(dir) + "\n")
+		return dir
 
 	def check_decision(self, dir):
 		if dir == self.last_direction:
@@ -372,6 +483,8 @@ class DecisionFactory:
 		else:
 			self.last_result = False
 		self.mind.learn(self.last_direction, self.last_result)
+		if self.following and self.last_result is False:
+			self.following = False
 		if self.last_result is True:
 			if self.backtravelling is False:
 				self.mind.path.push(self.last_direction)
