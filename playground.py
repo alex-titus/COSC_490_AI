@@ -1,4 +1,2 @@
-import PathMemory
-
-mem = PathMemory.PathMemory()
-mem.shorten()
+import numpy
+from DecisionFactory import *
