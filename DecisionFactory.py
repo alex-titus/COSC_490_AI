@@ -346,7 +346,7 @@ class PathMemory:
 				return True
 			elif a == 'right' and c == 'left' and (b == 'up' or b == 'down'):
 				return True
-			return 	
+			return
 		shortcut = self.lastPath.path[:]
 		a = 0
 		while a < len(shortcut) - 2 and len(shortcut) >= 3:

@@ -27,8 +27,12 @@ GRAY = 2
 BLACK = 3
 PLAYER = 4
 #PORTAL = 5
-playerX = 1
-playerY = 1
+startX = 1
+startY = 1
+playerX = startX
+playerY = startY
+dx = 0
+dy = 0
 portalX = 0
 portalY = 0
 
@@ -183,6 +187,8 @@ print(tilemap)
 
 # THE COMPUTER IS ALIVE!
 AI = DecisionFactory.DecisionFactory()
+dx = AI.mind.relX - playerX
+dy = AI.mind.relY - playerY
 
 while True:
 	dx = AI.mind.relX - playerX

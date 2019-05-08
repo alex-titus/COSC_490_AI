@@ -64,9 +64,7 @@ left
 left
 left
 left
-down
 left
-up
 up
 up
 up
