@@ -134,7 +134,7 @@ while True:
                     tile(playerX, playerY)
                     playerY += 1
     else:
-        direction = AI.random_direction()
+        direction = AI.get_decision(playerX, playerY)
         if direction == 'up':
             if tilemap[playerY-1, playerX] == 1:
                 steps += 1

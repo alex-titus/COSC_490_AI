@@ -2,9 +2,6 @@ import pygame, numpy, time, sys
 from pygame.locals import *
 import DecisionFactory
 
-# THE COMPUTER IS ALIVE!
-AI = DecisionFactory.DecisionFactory()
-
 
 def player(playerX, playerY):
     display.blit(textures[PLAYER], (playerX*TILESIZE, playerY*TILESIZE))
@@ -101,21 +98,63 @@ def right(playerX, playerY):
         tile(playerX, playerY)
     return results
 
+def movePlayer(direction, playerX, playerY):
+    if direction == 'left':
+        if tilemap[playerY, playerX - 1] == 1:
+            results = False
+            print("Failure: Left")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Left")
+            return results
+    if direction == 'right':
+        if tilemap[playerY, playerX - 1] == 1:
+            results = False
+            print("Failure: Right")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Right")
+            return results
+    if direction == 'Up':
+        if tilemap[playerY - 1, playerX] == 1:
+            results = False
+            print("Failure: Up")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Up")
+            return results
+    if direction == 'down':
+        if tilemap[playerY + 1, playerX] == 1:
+            results = False
+            print("Failure: Down")
+            return results
+        else:
+            results = True
+            tile(playerX, playerY)
+            print("Success: Down")
+            return results
+
 # Which map we are going to be opening
 currentMap = open(filename, 'r')
 
 # Information about the map we are creating
 TILESIZE = 40
-MAPWIDTH = 10
-MAPHEIGHT = 10
+MAPWIDTH = 0
+MAPHEIGHT = 0
 
 #Setting up numbers to keep track
 WALL = 0
 TILE = 1
 PLAYER = 2
 PORTAL = 3
-playerX = 0
-playerY = 0
+playerX = 1
+playerY = 1
 portalX = 0
 portalY = 0
 
@@ -131,40 +170,39 @@ textures = {
                                    [TILESIZE, TILESIZE]),
 }
 
-# Initializing pygame and creating the map
-pygame.init()
-FPS = 24
-fpsClock = pygame.time.Clock()  # type: None
-display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
-
 # Map creation
-tilemap = numpy.zeros(shape=(MAPWIDTH, MAPHEIGHT), dtype=numpy.int16)
-column = 0
+tilemap = []
 for line in currentMap:
-    row = 0
+    tilemap.append([])
     for ch in line:
         if ch == '1':
-            wall(row, column)
-            tilemap[column, row] = 1
+            tilemap[MAPHEIGHT].append(1)
         elif ch == '.':
-            tile(row, column)
+            tilemap[MAPHEIGHT].append(0)
         elif ch == '0':
-            tile(row, column)
-            playerX = row
-            playerY = column
+            playerX = MAPWIDTH
+            playerY = MAPHEIGHT
         elif ch == '2':
-            tile(row, column)
-            portal(row, column)
-            portalX = row
-            portalY = column
-        row += 1
-    column += 1
+            portalX = MAPWIDTH
+            portalY = MAPHEIGHT
+        MAPWIDTH += 1
+    MAPHEIGHT += 1
 
 steps = 0
 fail = 0
 success = 0
 print(tilemap)
 
+
+
+# Initializing pygame and creating the map
+pygame.init()
+FPS = 24
+fpsClock = pygame.time.Clock()  # type: None
+display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # type: None
+
+# THE COMPUTER IS ALIVE!
+AI = DecisionFactory.DecisionFactory()
 
 while True:
     # Get all the user events
@@ -201,9 +239,11 @@ while True:
                 if results:
                     playerY += 1
     else:
-        direction = AI.random_direction()
+        direction = AI.get_decision(playerX, playerY)
+        print('(' + str(playerX) + ", " + str(playerY) + ')')
         if direction == 'up':
             results = up(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -213,6 +253,7 @@ while True:
                 success += 1
         if direction == 'down':
             results = down(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -222,6 +263,7 @@ while True:
                 steps += 1
         if direction == 'left':
             results = left(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
@@ -231,6 +273,7 @@ while True:
                 steps += 1
         if direction == 'right':
             results = right(playerX, playerY)
+            AI.put_result(playerX, playerY, results)
             if results is False:
                 steps += 1
                 fail += 1
