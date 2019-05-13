@@ -115,20 +115,20 @@ class MemoryMap:
 	def auditTile(self, x, y):
 		adjacents = [[y, x-1], [y-1, x], [y, x+1], [y+1,x]]#[self.map[y][x-1], self.map[y-1][x], self.map[y][x+1], self.map[y+1][x]]
 		wallblackcount = 0
-		if self.map[y][x] == TileType.gray:
+		if self.map[y][x] == TileType.gray or self.map[y][x] == TileType.white:
 			for coord in adjacents:
 				if self.isWithinBounds(coord[1], coord[0]):
 					tile = self.map[coord[0]][coord[1]]
 				 	if tile == TileType.wall or tile == TileType.black:
 					 	wallblackcount += 1
-		if wallblackcount >= 3:
-			return wallblackcount
+		if (self.map[y][x] == TileType.gray and wallblackcount >= 3) or (self.map[y][x] == TileType.white and wallblackcount == 4):
+			return True
 
 		layouts = [[[y-1, x], [y, x-1], [y+1, x+1]], [[y-1, x], [y, x+1], [y+1, x-1]], [[y+1,x], [y,x-1], [y-1,x+1]], [[y+1, x], [y, x+1], [y-1, x-1]]]
-		if True:#self.map[y][x] == TileType.gray:
+		if self.map[y][x] == TileType.gray:
 			for layout in layouts:
 				if self.isWithinBounds(layout[0][1], layout[0][0]) and self.isWithinBounds(layout[1][1], layout[1][0]) and self.isWithinBounds(layout[2][1], layout[2][0]):
-					if self.map[layout[0][0]][layout[0][1]] == TileType.wall and self.map[layout[1][0]][layout[1][1]] == TileType.wall and self.map[layout[2][0]][layout[2][1]] == TileType.gray:
+					if (self.map[layout[0][0]][layout[0][1]] == TileType.wall or self.map[layout[0][0]][layout[0][1]] == TileType.black) and (self.map[layout[1][0]][layout[1][1]] == TileType.wall or self.map[layout[1][0]][layout[1][1]] == TileType.black) and (self.map[layout[2][0]][layout[2][1]] == TileType.gray or self.map[layout[2][0]][layout[2][1]] == TileType.black):
 						return True
 		return False
 
@@ -140,15 +140,19 @@ class MemoryMap:
 	def auditAndMarkBlack(self, x, y):
 		if self.auditTile(x, y) and self.isWithinBounds(x, y):
 			self.map[y][x] = TileType.black
-
+			#self.auditAdjacents(x, y)
+			return True
+		return False
 	def reAuditMap(self):
 		y = 1#0
 		while y < len(self.map)-1:#for col in self.map:
 			x = 1#0
 			while x < len(self.map[0])-1:#for row in col:
-				self.auditAndMarkBlack(x, y)
+				if self.auditAndMarkBlack(x, y):
+					return True
 				x += 1
 			y += 1
+		return False
 
 	def memorize(self, x, y, direction, result, surroundings = []):
 		self.expand_if_needed(x, y)
@@ -164,26 +168,38 @@ class MemoryMap:
 		#				self.map[y+self.forY-1+a][x+self.forX-1+b] = TileType.gray
 		#			b += 1
 		#		a += 1
-
 		if result == True:
-			self.map[y+self.forY][x+self.forX] = TileType.gray
-			self.auditAndMarkBlack(x+self.forX, y+self.forY)
+			if self.map[y+self.forY][x+self.forX] == TileType.white:
+				self.map[y+self.forY][x+self.forX] = TileType.gray
+#			self.auditAndMarkBlack(x+self.forX, y+self.forY)
+			#if direction == 'left':
+			#	self.auditAndMarkBlack(x+self.forX+1, y+self.forY)
+			#elif direction == 'right':
+			#	self.auditAndMarkBlack(x+self.forX-1, y+self.forY)
+			#elif direction == 'up':
+			#	self.auditAndMarkBlack(x+self.forX, y+self.forY+1)
+			#elif direction == 'down':
+			#	self.auditAndMarkBlack(x+self.forX, y+self.forY-1)
 				#self.map[y+self.forY][x+self.forX] = TileType.black
+
 		elif result == False:
 			if direction == 'left':
 				self.map[y+self.forY][x+self.forX-1] = TileType.wall
-				self.auditAdjacents(x+self.forX-1, y+self.forY)
+#				self.auditAdjacents(x+self.forX-1, y+self.forY)
 			elif direction == 'right':
 				self.map[y+self.forY][x+self.forX+1] = TileType.wall
-				self.auditAdjacents(x+self.forX+1, y+self.forY)
+#				self.auditAdjacents(x+self.forX+1, y+self.forY)
 			elif direction == 'up':
 				self.map[y+self.forY-1][x+self.forX] = TileType.wall
-				self.auditAdjacents(x+self.forX, y+self.forY-1)
+#				self.auditAdjacents(x+self.forX, y+self.forY-1)
 			elif direction == 'down':
 				self.map[y+self.forY+1][x+self.forX] = TileType.wall
-				self.auditAdjacents(x+self.forX, y+self.forY+1)
+#				self.auditAdjacents(x+self.forX, y+self.forY+1)
 		#elif direction == 'wait':
 		#	self.map[y+self.forY][x+self.forX] = TileType.gray
+
+#		self.auditAdjacents(x+self.forX, y+self.forY)
+			self.reAuditMap()
 
 	def rememberWall(self, x, y, direction):
 		self.expand_if_needed(x, y)
@@ -387,9 +403,9 @@ class Mind:
 		self.recentWhiteAdjacents = TravelPath()
 		self.normalExit = False
 
-	def __del__(self):
-		if self.normalExit:
-			self.pathMem.update(self.path)
+	#def __del__(self):
+	#	if self.normalExit:
+	#		self.pathMem.update(self.path)
 
 	def move(self, direction):
 		if direction == 'left':

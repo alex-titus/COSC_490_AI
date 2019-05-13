@@ -52,7 +52,7 @@ textures = {
 }
 def updateclock(FPS, slowmode_enabled):
 	fpsClock.tick(FPS)
-	if slowmode_enabled == True: pygame.time.wait(125)
+	if slowmode_enabled == True: pygame.time.wait(300)
 
 # GFX
 def redtile(playerX, playerY):
