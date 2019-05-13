@@ -1,6 +1,7 @@
 import pygame, numpy, time, sys
 from DecisionFactory import MemoryMap
 from DecisionFactory import TileType
+from DecisionFactory import TileType
 from pygame.locals import *
 import DecisionFactory
 
@@ -51,21 +52,17 @@ textures = {
 }
 def updateclock(FPS, slowmode_enabled):
 	fpsClock.tick(FPS)
-	if slowmode_enabled == True: pygame.time.wait(450)
+	if slowmode_enabled == True: pygame.time.wait(125)
 
 # GFX
 def redtile(playerX, playerY):
 	display.blit(textures[RED], (playerX*TILESIZE, playerY*TILESIZE))
-
 def whitetile(playerX, playerY):
 	display.blit(textures[WHITE], (playerX*TILESIZE, playerY*TILESIZE))
-
 def graytile(playerX, playerY):
 	display.blit(textures[GRAY], (playerX*TILESIZE, playerY*TILESIZE))
-
 def blacktile(playerX, playerY):
 	display.blit(textures[BLACK], (playerX*TILESIZE, playerY*TILESIZE))
-
 def player(playerX, playerY):
 	display.blit(textures[PLAYER], (playerX*TILESIZE, playerY*TILESIZE))
 
@@ -79,7 +76,6 @@ def attemptUp(playerX, playerY):
 		results = True
 		print("Success: Up")
 		return results
-
 def attemptDown(playerX, playerY):
 	if tilemap[playerY + 1, playerX] == 1:
 		results = False
@@ -89,7 +85,6 @@ def attemptDown(playerX, playerY):
 		results = True
 		print("Success: Down")
 		return results
-
 def attemptleft(playerX, playerY):
 	if tilemap[playerY, playerX - 1] == 1:
 		results = False
@@ -99,7 +94,6 @@ def attemptleft(playerX, playerY):
 		results = True
 		print("Success: Left")
 		return results
-
 def attemptright(playerX, playerY):
 	if tilemap[playerY, playerX + 1] == 1:
 		results = False
@@ -115,24 +109,40 @@ def up(playerX, playerY):
 	#if results:
 	#	tile(playerX, playerY)
 	return results
-
 def down(playerX, playerY):
 	results = attemptDown(playerX, playerY)
 	#if results:
 	#	tile(playerX, playerY)
 	return results
-
 def left(playerX, playerY):
 	results = attemptleft(playerX, playerY)
 	#if results:
 	#	tile(playerX, playerY)
 	return results
-
 def right(playerX, playerY):
 	results = attemptright(playerX, playerY)
 	#if results:
 	#	tile(playerX, playerY)
 	return results
+
+def get3x3(px = playerX, py = playerY):
+	arr = []
+	a = 0
+	while a < 3:
+		arr.append(tilemap[(py-1+a)][(px-1):(px+2)])
+		a += 1
+	#print(arr)
+	#print(tilemap[1, 2])
+	#print(tilemap[1][2])
+	#arr.append(tilemap[1][0:3])
+	#print(tilemap[1+a][0:3])
+	#arr.append(tilemap[py][px])
+
+	#print(arr)
+	return arr
+def getSurroundings(px = playerX, py = playerY):
+	arr = [tilemap[py][px-1], tilemap[py-1][px], tilemap[py][px+1], tilemap[py+1][px]]
+	return arr
 
 def paintmap():
 	spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1]]
@@ -166,6 +176,7 @@ for line in currentMap:
 	column = 0
 	for ch in line:
 		whitetile(column, row)
+			#tilemap[row, column] = 0
 		if ch == '1':
 			tilemap[row, column] = 1
 		#elif ch == '.':
@@ -205,6 +216,7 @@ while True:
 			print("Portal was found in : " + str(steps) + " steps.")
 			print("Failed steps: " + str(fail) + " steps. ")
 			print("Succesful steps: " + str(success) + " steps.")
+			AI.mind.normalExit = True
 			pygame.quit()
 			sys.exit()
 
@@ -217,8 +229,8 @@ while True:
 			AI.put_result('failure')
 			fail += 1
 		else:
-			AI.put_result('success')
 			playerY -= 1
+			AI.put_result('success', get3x3(playerX, playerY))
 			success += 1
 		steps += 1
 	if direction == 'down':
@@ -227,8 +239,8 @@ while True:
 			AI.put_result('failure')
 			fail += 1
 		else:
-			AI.put_result('success')
 			playerY += 1
+			AI.put_result('success', get3x3(playerX, playerY))
 			success += 1
 		steps += 1
 	if direction == 'left':
@@ -237,8 +249,8 @@ while True:
 			AI.put_result('failure')
 			fail += 1
 		else:
-			AI.put_result('success')
 			playerX -= 1
+			AI.put_result('success', get3x3(playerX, playerY))
 			success += 1
 		steps += 1
 	if direction == 'right':
@@ -247,8 +259,8 @@ while True:
 			AI.put_result('failure')
 			fail += 1
 		else:
-			AI.put_result('success')
 			playerX += 1
+			AI.put_result('success', get3x3(playerX, playerY))
 			success += 1
 		steps += 1
 
