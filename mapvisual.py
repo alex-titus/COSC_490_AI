@@ -7,10 +7,14 @@ import DecisionFactory
 
 filename = "./maps/rooms.txt"
 slowmode = False
+human = False
 results = True
 
 for x in sys.argv:
-	if x == "-s":
+	if x == "-h":
+		human = True
+		slowmode = False
+	elif x == "-s" and not human:
 		slowmode = True
 
 # Which map we are going to be opening
@@ -144,8 +148,8 @@ def getSurroundings(px = playerX, py = playerY):
 	arr = [tilemap[py][px-1], tilemap[py-1][px], tilemap[py][px+1], tilemap[py+1][px]]
 	return arr
 
-def paintmap():
-	spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1]]
+def paintsurroundings():
+	spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1], [playerX-2, playerY-2], [playerX-1, playerY-2], [playerX, playerY-2], [playerX+1, playerY-2], [playerX-2, playerY-1], [playerX+2, playerY-1], [playerX-2, playerY], [playerX+2, playerY], [playerX-2, playerY+1], [playerX+2, playerY+1], [playerX-2, playerY+2], [playerX-1, playerY+2], [playerX, playerY+2], [playerX+1, playerY+2], [playerX-2, playerY+1]]
 	for spot in spots:
 		x = spot[0]
 		y = spot[1]
@@ -162,7 +166,13 @@ def paintmap():
 			blacktile(x, y)
 		elif AI.mind.map.get(x+dx, y+dy) == TileType.wall:
 			redtile(x, y)
-
+def paintmap():
+	a = 0
+	while a < AI.mind.map.sizeY:
+		b = 0
+		while b < AI.mind.map.sizeX:
+			if AI.mind.map.map[a][b] == TileType.black:
+				blacktile(x, y)
 # Initializing pygame and creating the map
 pygame.init()
 FPS = 24
@@ -201,14 +211,39 @@ AI = DecisionFactory.DecisionFactory()
 dx = AI.mind.relX - playerX
 dy = AI.mind.relY - playerY
 
+moved = False
 while True:
+	if moved:
+		moved = False
 	dx = AI.mind.relX - playerX
 	dy = AI.mind.relY - playerY
 	# Get all the user events
+	direction = 'wait'
 	for event in pygame.event.get():
+		keys=pygame.key.get_pressed()
+		#print(str(human) + " " + str(event.type == pygame.KEYDOWN) + " " + str(keys[pygame.K_LEFT]))
 		if event.type == QUIT:
 			pygame.quit()
 			sys.exit()
+		elif human == True:
+			if event.type == pygame.KEYDOWN:
+				if keys[pygame.K_LEFT] == 1:
+					direction = 'left'
+					moved = True
+				elif keys[pygame.K_UP] == 1:
+					direction = 'up'
+					moved = True
+				elif keys[pygame.K_RIGHT] == 1:
+					direction = 'right'
+					moved = True
+				elif keys[pygame.K_DOWN] == 1:
+					direction = 'down'
+					moved = True
+				else:
+					moved = False
+				AI.last_direction = direction
+			else:
+				moved = False
 
 	# End Condition for ending the "game"
 	if playerX == portalX:
@@ -220,9 +255,14 @@ while True:
 			pygame.quit()
 			sys.exit()
 
-	print('Player Loc: (' + str(playerX) + ", " + str(playerY) + ')')
-	print('Rel Player Loc: (' + str(AI.mind.relX) + ", " + str(AI.mind.relY) + ')')
-	direction = AI.get_decision()
+
+	if not human:
+		direction = AI.get_decision()
+
+	if direction != 'wait':
+		print('Player Loc: (' + str(playerX) + ", " + str(playerY) + ')')
+		print('Rel Player Loc: (' + str(AI.mind.relX) + ", " + str(AI.mind.relY) + ')')
+
 	if direction == 'up':
 		results = up(playerX, playerY)
 		if results is False:
@@ -264,8 +304,9 @@ while True:
 			success += 1
 		steps += 1
 
-	paintmap()
+	paintsurroundings()
 	player(playerX, playerY)
 	pygame.display.update()
 	updateclock(FPS, slowmode)
-	print("\n")
+	if not human or (human and moved):
+		print("\n")

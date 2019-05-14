@@ -113,23 +113,20 @@ class MemoryMap:
 		print("")
 
 	def auditTile(self, x, y):
-		adjacents = [[y, x-1], [y-1, x], [y, x+1], [y+1,x]]#[self.map[y][x-1], self.map[y-1][x], self.map[y][x+1], self.map[y+1][x]]
-		wallblackcount = 0
-		if self.map[y][x] == TileType.gray or self.map[y][x] == TileType.white:
-			for coord in adjacents:
-				if self.isWithinBounds(coord[1], coord[0]):
-					tile = self.map[coord[0]][coord[1]]
-				 	if tile == TileType.wall or tile == TileType.black:
-					 	wallblackcount += 1
-		if (self.map[y][x] == TileType.gray and wallblackcount >= 3) or (self.map[y][x] == TileType.white and wallblackcount == 4):
-			return True
+		tile = self.map[y][x]
+		l = self.map[y][x-1]
+		u = self.map[y-1][x]
+		r = self.map[y][x+1]
+		d = self.map[y+1][x]
+		lu = self.map[y-1][x-1]
+		ru = self.map[y-1][x+1]
+		ld = self.map[y+1][x-1]
+		rd = self.map[y+1][x+1]
 
-		layouts = [[[y-1, x], [y, x-1], [y+1, x+1]], [[y-1, x], [y, x+1], [y+1, x-1]], [[y+1,x], [y,x-1], [y-1,x+1]], [[y+1, x], [y, x+1], [y-1, x-1]]]
-		if self.map[y][x] == TileType.gray:
-			for layout in layouts:
-				if self.isWithinBounds(layout[0][1], layout[0][0]) and self.isWithinBounds(layout[1][1], layout[1][0]) and self.isWithinBounds(layout[2][1], layout[2][0]):
-					if (self.map[layout[0][0]][layout[0][1]] == TileType.wall or self.map[layout[0][0]][layout[0][1]] == TileType.black) and (self.map[layout[1][0]][layout[1][1]] == TileType.wall or self.map[layout[1][0]][layout[1][1]] == TileType.black) and (self.map[layout[2][0]][layout[2][1]] == TileType.gray or self.map[layout[2][0]][layout[2][1]] == TileType.black):
-						return True
+		conditions = [(tile==TileType.white and (l == TileType.wall and u == TileType.wall and r == TileType.wall and d == TileType.wall)), (tile == TileType.gray and ((((l == TileType.wall or l == TileType.black) and (u == TileType.wall or u == TileType.wall)) and (r == TileType.gray and rd == TileType.gray and d == TileType.gray)) or ((l == TileType.wall and d == TileType.wall) and (u == TileType.gray and ru == TileType.gray and r == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.wall and ld == TileType.wall and d == TileType.wall)) or (((r == TileType.wall or r == TileType.black) and (d == TileType.wall or d == TileType.black)) and (l == TileType.gray and lu == TileType.gray and u == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.gray and ld == TileType.gray and d == TileType.gray)))), ((tile == TileType.gray or tile == TileType.white) and (((l == TileType.wall and r == TileType.wall) and (u == TileType.wall or d == TileType.wall)) or ((u == TileType.wall and d == TileType.wall) and (l == TileType.wall or r == TileType.wall))))]
+		for c in conditions:
+			if c:
+				return True
 		return False
 
 	def auditAdjacents(self, x, y):
@@ -144,12 +141,12 @@ class MemoryMap:
 			return True
 		return False
 	def reAuditMap(self):
-		y = 1#0
+		self.print_tilemap()
+		y = 1
 		while y < len(self.map)-1:#for col in self.map:
-			x = 1#0
-			while x < len(self.map[0])-1:#for row in col:
-				if self.auditAndMarkBlack(x, y):
-					return True
+			x = 1
+			while x < len(self.map[x])-1:#for row in col:
+				self.auditAndMarkBlack(x, y)
 				x += 1
 			y += 1
 		return False
@@ -199,7 +196,7 @@ class MemoryMap:
 		#	self.map[y+self.forY][x+self.forX] = TileType.gray
 
 #		self.auditAdjacents(x+self.forX, y+self.forY)
-			self.reAuditMap()
+		self.reAuditMap()
 
 	def rememberWall(self, x, y, direction):
 		self.expand_if_needed(x, y)
