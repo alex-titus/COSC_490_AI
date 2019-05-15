@@ -31,6 +31,7 @@ WHITE = 1
 GRAY = 2
 BLACK = 3
 PLAYER = 4
+BLUE = 5
 #PORTAL = 5
 startX = 1
 startY = 1
@@ -53,22 +54,25 @@ textures = {
 								 [TILESIZE, TILESIZE]),
 	PLAYER: pygame.transform.scale(pygame.image.load('./textures/player.png'),
 								 [TILESIZE, TILESIZE]),
+	BLUE: pygame.transform.scale(pygame.image.load('./textures/bluetile.png'), [TILESIZE, TILESIZE]),
 }
 def updateclock(FPS, slowmode_enabled):
 	fpsClock.tick(FPS)
-	if slowmode_enabled == True: pygame.time.wait(300)
+	if slowmode_enabled == True: pygame.time.wait(125)
 
 # GFX
-def redtile(playerX, playerY):
-	display.blit(textures[RED], (playerX*TILESIZE, playerY*TILESIZE))
-def whitetile(playerX, playerY):
-	display.blit(textures[WHITE], (playerX*TILESIZE, playerY*TILESIZE))
-def graytile(playerX, playerY):
-	display.blit(textures[GRAY], (playerX*TILESIZE, playerY*TILESIZE))
-def blacktile(playerX, playerY):
-	display.blit(textures[BLACK], (playerX*TILESIZE, playerY*TILESIZE))
-def player(playerX, playerY):
-	display.blit(textures[PLAYER], (playerX*TILESIZE, playerY*TILESIZE))
+def redtile(pX, pY):
+	display.blit(textures[RED], (pX*TILESIZE, pY*TILESIZE))
+def whitetile(pX, pY):
+	display.blit(textures[WHITE], (pX*TILESIZE, pY*TILESIZE))
+def graytile(pX, pY):
+	display.blit(textures[GRAY], (pX*TILESIZE, pY*TILESIZE))
+def blacktile(pX, pY):
+	display.blit(textures[BLACK], (pX*TILESIZE, pY*TILESIZE))
+def bluetile(pX, pY):
+	display.blit(textures[BLUE], (pX*TILESIZE, pY*TILESIZE))
+def player(pX, pY):
+	display.blit(textures[PLAYER], (pX*TILESIZE, pY*TILESIZE))
 
 # Movement
 def attemptUp(playerX, playerY):
@@ -149,7 +153,7 @@ def getSurroundings(px = playerX, py = playerY):
 	return arr
 
 def paintsurroundings():
-	spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1], [playerX-2, playerY-2], [playerX-1, playerY-2], [playerX, playerY-2], [playerX+1, playerY-2], [playerX-2, playerY-1], [playerX+2, playerY-1], [playerX-2, playerY], [playerX+2, playerY], [playerX-2, playerY+1], [playerX+2, playerY+1], [playerX-2, playerY+2], [playerX-1, playerY+2], [playerX, playerY+2], [playerX+1, playerY+2], [playerX-2, playerY+1]]
+	spots = [[playerX, playerY], [playerX-1, playerY], [playerX, playerY-1], [playerX+1, playerY], [playerX, playerY+1], [playerX-1, playerY-1], [playerX+1, playerY-1], [playerX-1, playerY+1], [playerX+1, playerY+1], [playerX-2, playerY-2], [playerX-1, playerY-2], [playerX, playerY-2], [playerX+1, playerY-2], [playerX-2, playerY-1], [playerX+2, playerY-1], [playerX-2, playerY], [playerX+2, playerY], [playerX-2, playerY+1], [playerX+2, playerY+1], [playerX-2, playerY+2], [playerX-1, playerY+2], [playerX, playerY+2], [playerX+1, playerY+2], [playerX-2, playerY+1]]
 	for spot in spots:
 		x = spot[0]
 		y = spot[1]
@@ -168,11 +172,16 @@ def paintsurroundings():
 			redtile(x, y)
 def paintmap():
 	a = 0
-	while a < AI.mind.map.sizeY:
+	while a < MAPHEIGHT and a < (AI.mind.map.sizeY-AI.mind.map.forY):
 		b = 0
-		while b < AI.mind.map.sizeX:
-			if AI.mind.map.map[a][b] == TileType.black:
-				blacktile(x, y)
+		while b < MAPWIDTH and b < (AI.mind.map.sizeX-AI.mind.map.forX):
+			#print(str(b+AI.mind.relX) + " " + str(a+AI.mind.relY))
+			#print(str(b) + " " + str(a))
+			if AI.mind.map.get(b, a) == TileType.black:
+				blacktile(b+1, a+1)
+			b += 1
+		a += 1
+
 # Initializing pygame and creating the map
 pygame.init()
 FPS = 24
@@ -221,7 +230,6 @@ while True:
 	direction = 'wait'
 	for event in pygame.event.get():
 		keys=pygame.key.get_pressed()
-		#print(str(human) + " " + str(event.type == pygame.KEYDOWN) + " " + str(keys[pygame.K_LEFT]))
 		if event.type == QUIT:
 			pygame.quit()
 			sys.exit()
@@ -305,6 +313,7 @@ while True:
 		steps += 1
 
 	paintsurroundings()
+	#paintmap()
 	player(playerX, playerY)
 	pygame.display.update()
 	updateclock(FPS, slowmode)

@@ -38,7 +38,7 @@ class MemoryMap:
 	def set(self, x, y, type):
 		self.map[y+self.forY][x+self.forX] = type
 
-	def expandMap(self):# var = 0):
+	def expandMap(self):
 		a = 0
 		while a < self.sizeY:
 			b = 0
@@ -104,8 +104,6 @@ class MemoryMap:
 			x = 0
 			row = ""
 			while x < self.sizeX:
-				#if x == 3 and y == 2:
-				#	print("HELLO")
 				row += (str(self.map[y][x].value) + "  ")
 				x += 1
 			print(row)
@@ -123,9 +121,9 @@ class MemoryMap:
 		ld = self.map[y+1][x-1]
 		rd = self.map[y+1][x+1]
 
-		conditions = [(tile==TileType.white and (l == TileType.wall and u == TileType.wall and r == TileType.wall and d == TileType.wall)), (tile == TileType.gray and ((((l == TileType.wall or l == TileType.black) and (u == TileType.wall or u == TileType.wall)) and (r == TileType.gray and rd == TileType.gray and d == TileType.gray)) or ((l == TileType.wall and d == TileType.wall) and (u == TileType.gray and ru == TileType.gray and r == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.wall and ld == TileType.wall and d == TileType.wall)) or (((r == TileType.wall or r == TileType.black) and (d == TileType.wall or d == TileType.black)) and (l == TileType.gray and lu == TileType.gray and u == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.gray and ld == TileType.gray and d == TileType.gray)))), ((tile == TileType.gray or tile == TileType.white) and (((l == TileType.wall and r == TileType.wall) and (u == TileType.wall or d == TileType.wall)) or ((u == TileType.wall and d == TileType.wall) and (l == TileType.wall or r == TileType.wall))))]
+		conditions = [(tile==TileType.white and (l == TileType.wall and u == TileType.wall and r == TileType.wall and d == TileType.wall)), (tile == TileType.gray and ((((l == TileType.wall or l == TileType.black) and (u == TileType.wall or u == TileType.black)) and (r == TileType.gray and rd == TileType.gray and d == TileType.gray)) or (((l == TileType.wall or l == TileType.black) and (d == TileType.wall or d == TileType.black)) and (u == TileType.gray and ru == TileType.gray and r == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.wall and ld == TileType.wall and d == TileType.wall)) or (((r == TileType.wall or r == TileType.black) and (d == TileType.wall or d == TileType.black)) and (l == TileType.gray and lu == TileType.gray and u == TileType.gray)) or (((r == TileType.wall or r == TileType.black) and (u == TileType.wall or u == TileType.black)) and (l == TileType.gray and ld == TileType.gray and d == TileType.gray)))), ((tile == TileType.gray or tile == TileType.white) and ((((l == TileType.wall or (l == TileType.black and tile != TileType.white)) and (r == TileType.wall or (r == TileType.black and tile != TileType.white))) and ((u == TileType.wall or (u == TileType.black and tile != TileType.white)) or (d == TileType.wall or (d == TileType.black and tile != TileType.white)))) or (((u == TileType.wall or (u == TileType.black and tile != TileType.white)) and (d == TileType.wall or (d == TileType.black and tile != TileType.white))) and ((l == TileType.wall or (l == TileType.black and tile != TileType.white)) or (r == TileType.wall or (r == TileType.black and tile != TileType.white))))))]
 		for c in conditions:
-			if c:
+			if c and tile != TileType.wall:
 				return True
 		return False
 
@@ -140,6 +138,7 @@ class MemoryMap:
 			#self.auditAdjacents(x, y)
 			return True
 		return False
+
 	def reAuditMap(self):
 		self.print_tilemap()
 		y = 1
@@ -153,49 +152,18 @@ class MemoryMap:
 
 	def memorize(self, x, y, direction, result, surroundings = []):
 		self.expand_if_needed(x, y)
-		#print(surroundings)
-		#if result == True and (len(surroundings) == 3  ):# and len(surroundings[0]) != 3):
-		#	a = 0
-		#	while a < 3:
-		#		b = 0
-		#		while b < 3:
-		#			if surroundings[a][b] == 1:
-		#				self.map[y+self.forY-1+a][x+self.forX-1+b] = TileType.wall
-		#			elif surroundings[a][b] == 0:
-		#				self.map[y+self.forY-1+a][x+self.forX-1+b] = TileType.gray
-		#			b += 1
-		#		a += 1
 		if result == True:
 			if self.map[y+self.forY][x+self.forX] == TileType.white:
 				self.map[y+self.forY][x+self.forX] = TileType.gray
-#			self.auditAndMarkBlack(x+self.forX, y+self.forY)
-			#if direction == 'left':
-			#	self.auditAndMarkBlack(x+self.forX+1, y+self.forY)
-			#elif direction == 'right':
-			#	self.auditAndMarkBlack(x+self.forX-1, y+self.forY)
-			#elif direction == 'up':
-			#	self.auditAndMarkBlack(x+self.forX, y+self.forY+1)
-			#elif direction == 'down':
-			#	self.auditAndMarkBlack(x+self.forX, y+self.forY-1)
-				#self.map[y+self.forY][x+self.forX] = TileType.black
-
 		elif result == False:
 			if direction == 'left':
 				self.map[y+self.forY][x+self.forX-1] = TileType.wall
-#				self.auditAdjacents(x+self.forX-1, y+self.forY)
 			elif direction == 'right':
 				self.map[y+self.forY][x+self.forX+1] = TileType.wall
-#				self.auditAdjacents(x+self.forX+1, y+self.forY)
 			elif direction == 'up':
 				self.map[y+self.forY-1][x+self.forX] = TileType.wall
-#				self.auditAdjacents(x+self.forX, y+self.forY-1)
 			elif direction == 'down':
 				self.map[y+self.forY+1][x+self.forX] = TileType.wall
-#				self.auditAdjacents(x+self.forX, y+self.forY+1)
-		#elif direction == 'wait':
-		#	self.map[y+self.forY][x+self.forX] = TileType.gray
-
-#		self.auditAdjacents(x+self.forX, y+self.forY)
 		self.reAuditMap()
 
 	def rememberWall(self, x, y, direction):
@@ -247,7 +215,6 @@ class MemoryMap:
 		return True
 
 	def remove_bad_choices(self, x, y, directions):
-		#self.expand_if_needed(x, y)
 		copy = list(directions)
 		for d in copy:
 			if d == 'left':
@@ -265,7 +232,6 @@ class MemoryMap:
 		return directions
 
 	def remove_grayblack_choices(self, x, y, directions):
-		#self.expand_if_needed(x, y)
 		copy = list(directions)
 		for d in copy:
 			if d == 'left':
@@ -341,8 +307,6 @@ class PathMemory:
 
 	def update(self, tpath):
 		f = open(self.dir, 'w')
-		#f.write(str(x) + "\n")
-		#f.write(str(y) + "\n")
 		path = tpath.path
 		while len(path) > 0:
 			f.write(path[0] + "\n")
@@ -400,10 +364,6 @@ class Mind:
 		self.recentWhiteAdjacents = TravelPath()
 		self.normalExit = False
 
-	#def __del__(self):
-	#	if self.normalExit:
-	#		self.pathMem.update(self.path)
-
 	def move(self, direction):
 		if direction == 'left':
 			self.relX -= 1
@@ -415,44 +375,29 @@ class Mind:
 			self.relY += 1
 
 	def learn(self, direction, result, surroundings = []):
-		#if self.map.expand_if_needed(self.relX, self.relY):
-		#	self.relX += self.map.sizeX/4
-		#	self.relY += self.map.sizeY/4
 		if result == True:
 			self.move(direction)
 		self.map.memorize(self.relX, self.relY, direction, result, surroundings)
-		#if result == True:
-		#	self.move(direction)
 
 	def remove_bad_choices(self, directions):
-		#if self.map.expand_if_needed(self.relX, self.relY):
-		#	self.relX += self.map.sizeX/4
-		#	self.relY += self.map.sizeY/4
 		return self.map.remove_bad_choices(self.relX, self.relY, directions)
 
 	def remove_grayblack_choices(self, directions):
-		#if self.map.expand_if_needed(self.relX, self.relY):
-		#	self.relX += self.map.sizeX/4
-		#	self.relY += self.map.sizeY/4
 		return self.map.remove_grayblack_choices(self.relX, self.relY, directions)
 
 class DecisionFactory:
 	def __init__(self, name = 'Joe'):
 		self.name = name
-		self.directions = [ 'wait', 'left', 'up', 'right', 'down']#'up', 'down', 'right', 'left']
+		self.directions = [ 'wait', 'left', 'up', 'right', 'down']
 		self.last_result = 'success'
 		self.last_direction = 'wait'
 		self.mind = Mind()
 		self.backtravelling = False
 		self.following = self.mind.pathMem.memoryExists
-		# Note: we have relativisitic coordinates recorded here, since the map
-		# is relative to the players first known recorded position:
-		# self.state.pos = (0, 0)
 		random.seed(random.randint(1, 5000))
 
 	def get_decision(self, verbose = True):
 		if self.following:
-			#print(self.mind.pathMem.lastPath.path)
 			dir = self.mind.pathMem.lastPath.pop()
 		else:
 			dir = self.smart_direction()
