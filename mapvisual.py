@@ -5,25 +5,50 @@ from DecisionFactory import TileType
 from pygame.locals import *
 import DecisionFactory
 
-filename = "./maps/rooms.txt"
+defaultfilename = "./maps/firstmap.txt"
+filename = defaultfilename
+custommap = False
 slowmode = False
+slowmodewait = 100
 human = False
 results = True
 
+argi = 0
 for x in sys.argv:
-	if x == "-h":
+	if argi == 1:
+		if x == "-m":
+			custommap = True
+	elif argi == 2 and custommap:
+		filename = ("./maps/" + x)
+	elif x == "-h":
 		human = True
 		slowmode = False
-	elif x == "-s" and not human:
+	elif (x == "-s" or x == "-ss") and not human:
 		slowmode = True
+		if x == "-ss":
+			slowmodewait *=2
+	argi += 1
 
 # Which map we are going to be opening
-currentMap = open(filename, 'r')
+try:
+	currentMap = open(filename, 'r')
+except IOError:
+	currentMap = open(filename, 'r')
+
 
 # Information about the map we are creating
+MAPWIDTH = 0
+MAPHEIGHT = 0
+cnt = 0
+for line in currentMap:
+	if cnt == 0:
+		MAPHEIGHT = int(line)
+	elif cnt == 1:
+		MAPWIDTH = int(line)
+		break
+	cnt += 1
+
 TILESIZE = 30
-MAPWIDTH = 20
-MAPHEIGHT = 15
 
 #Setting up numbers to keep track
 RED = 0
@@ -56,9 +81,10 @@ textures = {
 								 [TILESIZE, TILESIZE]),
 	BLUE: pygame.transform.scale(pygame.image.load('./textures/bluetile.png'), [TILESIZE, TILESIZE]),
 }
+
 def updateclock(FPS, slowmode_enabled):
 	fpsClock.tick(FPS)
-	if slowmode_enabled == True: pygame.time.wait(125)
+	if slowmode_enabled == True: pygame.time.wait(slowmodewait)
 
 # GFX
 def redtile(pX, pY):
@@ -191,11 +217,13 @@ display = pygame.display.set_mode((MAPWIDTH*TILESIZE, MAPHEIGHT*TILESIZE))  # ty
 # Map creation
 tilemap = numpy.zeros(shape=(MAPHEIGHT, MAPWIDTH), dtype=numpy.int16)
 row = 0
+#lines = 0
 for line in currentMap:
 	column = 0
+#	if lines >= 2:
 	for ch in line:
 		whitetile(column, row)
-			#tilemap[row, column] = 0
+		#tilemap[row, column] = 0
 		if ch == '1':
 			tilemap[row, column] = 1
 		#elif ch == '.':
