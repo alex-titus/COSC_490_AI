@@ -1,7 +1,6 @@
 import pygame, numpy, time, sys
 from DecisionFactory import MemoryMap
 from DecisionFactory import TileType
-from DecisionFactory import TileType
 from pygame.locals import *
 import DecisionFactory
 
@@ -163,17 +162,19 @@ def get3x3(px = playerX, py = playerY):
 	arr = []
 	a = 0
 	while a < 3:
-		arr.append(tilemap[(py-1+a)][(px-1):(px+2)])
+		b = 0
+		arr.append([])
+		while b < 3:
+			if tilemap[py-1+a][px-1+b] == 1:
+				arr[a].append(TileType.wall)
+			elif tilemap[py-1+a][px-1+b] == 0 or tilemap[py-1+a][px-1+b] == 2:
+				arr[a].append(TileType.gray)
+			else:
+				arr[a].append(TileType.white)
+			b += 1
 		a += 1
-	#print(arr)
-	#print(tilemap[1, 2])
-	#print(tilemap[1][2])
-	#arr.append(tilemap[1][0:3])
-	#print(tilemap[1+a][0:3])
-	#arr.append(tilemap[py][px])
-
-	#print(arr)
 	return arr
+
 def getSurroundings(px = playerX, py = playerY):
 	arr = [tilemap[py][px-1], tilemap[py-1][px], tilemap[py][px+1], tilemap[py+1][px]]
 	return arr
@@ -183,11 +184,7 @@ def paintsurroundings():
 	for spot in spots:
 		x = spot[0]
 		y = spot[1]
-		#if True: #(x >= 0 and x < AI.mind.map.sizeX) and (y >= 0 and y < AI.mind.map.sizeY):
 		AI.mind.map.expand_if_needed(x+dx, y+dy)
-		#AI.mind.relX += AI.mind.map.sizeX/4
-		#AI.mind.relY += AI.mind.map.sizeY/4
-		#print(AI.mind.map.get(x+dx, y+dy).value)
 		if AI.mind.map.get(x+dx, y+dy) == TileType.white:
 			whitetile(x, y)
 		elif AI.mind.map.get(x+dx, y+dy) == TileType.gray:

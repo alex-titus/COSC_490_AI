@@ -150,11 +150,29 @@ class MemoryMap:
 			y += 1
 		return False
 
+	def updateSurroundings(self, x, y, surroundings):
+		if len(surroundings) == 0:
+			return False
+		if (len(surroundings) != 3 or (len(surroundings[0]) != 3 or len(surroundings[1]) != 3 or len(surroundings[2]) != 3)):
+			raise Exception("Error: Invalid Dimensions for Surroundings. " + str(len(surroundings)))# + " " + str(len(surroundings[0])) + " " + str(len(surroundings[1])) + " " + str(len(surroundings[2])))
+		tiles = [[y-1, x-1], [y-1, x], [y-1, x+1], [y, x-1], [y, x], [y, x+1], [y+1, x-1], [y+1, x], [y+1, x+1]]
+		a = 0
+		while a < 3:
+			b = 0
+			while b < 3:
+				print(str(x-1+a+self.forY) + " " + str(y-1+b+self.forX))
+				if surroundings[a][b] != TileType.white:
+					self.map[y-1+a+self.forY][x-1+b+self.forX] = surroundings[a][b]
+				b += 1
+			a += 1
+		return True
+
 	def memorize(self, x, y, direction, result, surroundings = []):
 		self.expand_if_needed(x, y)
 		if result == True:
-			if self.map[y+self.forY][x+self.forX] == TileType.white:
-				self.map[y+self.forY][x+self.forX] = TileType.gray
+			if not self.updateSurroundings(x, y, surroundings):
+				if self.map[y+self.forY][x+self.forX] == TileType.white:
+					self.map[y+self.forY][x+self.forX] = TileType.gray
 		elif result == False:
 			if direction == 'left':
 				self.map[y+self.forY][x+self.forX-1] = TileType.wall
@@ -164,6 +182,7 @@ class MemoryMap:
 				self.map[y+self.forY-1][x+self.forX] = TileType.wall
 			elif direction == 'down':
 				self.map[y+self.forY+1][x+self.forX] = TileType.wall
+			self.updateSurroundings(x, y, surroundings)
 		self.reAuditMap()
 
 	def rememberWall(self, x, y, direction):
